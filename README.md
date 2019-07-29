@@ -62,7 +62,7 @@
 # Changelog [Before Version : Master - Beta 1]
 
 - Now, I made it more tidy ;d
-- NEW functions: ['/칭호 제거', SignPrefxShop]
+- NEW functions: ['/칭호 제거', SignPrefixShop]
 
 
 # 체인지로그 [지난 버전 : Master - Beta 1 ]
