@@ -409,7 +409,7 @@ class MibPrefix extends PluginBase implements Listener
 		$name = strtolower ($player->getName());
 		
 		if (! isset ($this->player [$name])) $this->createData ($player);
-		$this->player [$name]['닉네임'] = $prefix;
+		$this->player [$name]['닉네임'] = $name2;
 		
 	}
 
