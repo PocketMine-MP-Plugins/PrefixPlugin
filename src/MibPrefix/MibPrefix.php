@@ -484,7 +484,7 @@ class MibPrefix extends PluginBase implements Listener
 							
 							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
 							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
+							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
 							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
 							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
 							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
@@ -522,7 +522,7 @@ class MibPrefix extends PluginBase implements Listener
 							
 							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
 							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
+							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
 							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
 							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
 							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
@@ -559,7 +559,7 @@ class MibPrefix extends PluginBase implements Listener
 							
 							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
 							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
+							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
 							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
 							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
 							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
@@ -602,7 +602,7 @@ class MibPrefix extends PluginBase implements Listener
 							
 							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
 							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
+							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
 							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
 							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
 							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
@@ -642,7 +642,7 @@ class MibPrefix extends PluginBase implements Listener
 							
 							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
 							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
+							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
 							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
 							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
 							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
@@ -671,7 +671,7 @@ class MibPrefix extends PluginBase implements Listener
 							
 							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
 							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
+							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
 							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
 							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
 							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
@@ -703,7 +703,7 @@ class MibPrefix extends PluginBase implements Listener
 							
 							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
 							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
+							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
 							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
 							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
 							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
@@ -741,7 +741,7 @@ class MibPrefix extends PluginBase implements Listener
 							
 							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
 							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
+							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
 							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
 							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
 							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
@@ -772,7 +772,7 @@ class MibPrefix extends PluginBase implements Listener
 						
 						$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
 						$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-						$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
+						$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
 						$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
 						$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
 						$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
