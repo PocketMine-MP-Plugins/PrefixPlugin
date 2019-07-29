@@ -81,7 +81,7 @@ class MibPrefix extends PluginBase implements Listener
 
 		$this->database = new Config($this->getDataFolder() . 'config.yml', Config::YAML, [
 		
-			'채팅 타입' => '§r  §a[§f(칭호)§r§a] §f(닉네임)§r§f: (채팅색)(채팅)',
+			'채팅 타입' => '§a《§f(칭호)§r§a》 §f(닉네임)§r§f: (채팅색)(채팅)',
 			
 			'채팅 색' => [
 			
