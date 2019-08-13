@@ -103,7 +103,7 @@ class MibPrefix extends PluginBase implements Listener
 		$this->shop = $this->shopbase->getAll();
 		
 		$this->signbase = new Config($this->getDataFolder() . 'sign.yml', Config::YAML);
-		$this->sign = $this->shopbase->getAll();
+		$this->sign = $this->signbase->getAll();
 		
 		$this->addCommand (['칭호']);
 		
@@ -220,7 +220,7 @@ class MibPrefix extends PluginBase implements Listener
 			$prefix = $event->getLine(1);
 			$price = (int) $event->getLine(2);
 			
-			$this->shop [getStringByPos ($event->getBlock())] = [
+			$this->sign [getStringByPos ($event->getBlock())] = [
 			
 				'생성 시간' => time(),
 				'칭호' => $prefix,
@@ -258,9 +258,9 @@ class MibPrefix extends PluginBase implements Listener
 
 		if ($block->getId() == Block::SIGN_POST || $block->getId() == Block::WALL_SIGN) {
 
-			if (isset ($this->shop [getStringByPos ($block)])) {
+			if (isset ($this->sign [getStringByPos ($block)])) {
 				
-				unset ($this->shop [getStringByPos ($block)]);
+				unset ($this->sign [getStringByPos ($block)]);
 				$this->msg ($player, '칭호 상점을 제거했습니다');
 				
 				return true;
@@ -281,9 +281,9 @@ class MibPrefix extends PluginBase implements Listener
 
 		if ($block->getId() == Block::SIGN_POST || $block->getId() == Block::WALL_SIGN) {
 
-			if (isset ($this->shop [getStringByPos ($block)])) {
+			if (isset ($this->sign [getStringByPos ($block)])) {
 				
-				$dataBase = $this->shop [getStringByPos ($block)];
+				$dataBase = $this->sign [getStringByPos ($block)];
 				
 				$prefix = $dataBase ['칭호'];
 				$price = $dataBase ['가격'];
