@@ -58,7 +58,7 @@ function getPosByString ($string)
 class MibPrefix extends PluginBase implements Listener
 {
 	
-	public $title = '§l[ 네오스 칭호 시스템 ]';
+	public $title = '§l【 네오스 칭호 시스템 】';
 	
 	public $id = [
 	
@@ -81,11 +81,11 @@ class MibPrefix extends PluginBase implements Listener
 
 		$this->database = new Config($this->getDataFolder() . 'config.yml', Config::YAML, [
 		
-			'채팅 타입' => '§a《§f(칭호)§r§a》 §f(닉네임)§r§f: (채팅색)(채팅)',
+			'채팅 타입' => '§6 『 §f(칭호) §r§6』 §f(닉네임)§r§f: (채팅색)(채팅)',
 			
 			'채팅 색' => [
 			
-				'관리자' => '§a',
+				'관리자' => '§6',
 				'유저' => '§f'
 				
 			],
@@ -154,14 +154,14 @@ class MibPrefix extends PluginBase implements Listener
 	public function msg($player, $msg)
 	{
 		
-		$player->sendMessage ('§a<§f시스템§a> '.$msg);
+		$player->sendMessage ('§6 ▶ §f'.$msg);
 		
 	}
 	
 	public function allmsg($msg)
 	{
 		
-		$this->getServer()->broadcastMessage ('§a<§f시스템§a> '.$msg);
+		$this->getServer()->broadcastMessage ('§6 ▶ §f'.$msg);
 
 	}
 
@@ -191,7 +191,7 @@ class MibPrefix extends PluginBase implements Listener
 			'content' => "\n" . $msg . "\n\n\n",
 			'buttons' => [
 				[
-					'text' => '§l시스템 종료하기' . "\n" . '§r§8현재 열린 창을 닫습니다'
+					'text' => '§l▶ 시스템 종료하기' . "\n" . '§r§8현재 열린 창을 닫습니다'
 				]
 			]
 		]);
@@ -230,10 +230,10 @@ class MibPrefix extends PluginBase implements Listener
 			
 			foreach ([
 
-				'§a§l< §f칭호 상점 §a>',
-				'§a칭호: §f' . $prefix,
-				'§a가격: §f' . number_format ($price) . '원',
-				'§a§l- - - - - - -'
+				'§6『 §f칭호 상점 §6』',
+				'§6칭호: §f' . $prefix,
+				'§6가격: §f' . number_format ($price) . '원',
+				'§6§l- - - - - - -'
 
 			] as $index => $text) {
 
@@ -332,28 +332,24 @@ class MibPrefix extends PluginBase implements Listener
 		if ($event->isCancelled()) return true;
 		
 		$player = $event->getPlayer();
-		
-		$color = $this->db ['채팅 색']['유저'];
-		if ($player->isOp()) $color = $this->db ['채팅 색']['관리자'];
+		$color = $player->isOp() ? '§6' : '§7';
 
-		$format = str_replace ([
+		$event->setFormat (str_replace ([
 		
 			'(칭호)',
 			'(닉네임)',
-			'(채팅)',
-			'(채팅색)'
+			'(채팅색)',
+			'(채팅)'
 			
 		], [
 		
-			$this->getMainPrefix($player),
-			$this->getNick($player),
-			TextFormat::clean ($event->getMessage()),
-			$color
+			$this->getMainPrefix ($player) ?? '신입',
+			$this->getNick ($player) ?? $player->getName(),
+			$color,
+			TextFormat::clean ($event->getMessage())
 			
-		], $this->db ['채팅 타입']);
-		
-		$event->setFormat ($format);
-		
+		], $this->db ['채팅 타입']));
+
 	}
 
 	public function getMainPrefix($player)
@@ -459,7 +455,7 @@ class MibPrefix extends PluginBase implements Listener
 			$prefix = $prefix->getValue();
 			
 			$this->addPrefix ($player, $prefix);
-			$this->msg ($player, '칭호 §a' . $prefix . ' §r§f(을)를 추가하였습니다! 칭호 목록을 확인하세요!');
+			$this->msg ($player, '칭호 §6' . $prefix . ' §r§f(을)를 추가하였습니다! 칭호 목록을 확인하세요!');
 			
 			$player->getInventory()->removeItem ($item);
 
@@ -625,13 +621,13 @@ class MibPrefix extends PluginBase implements Listener
 						
 						if ($max < $page) $page = $max;
 
-						$player->sendMessage ('§a§l<===== §f칭호 목록 §a§l| §r§f' . $page . ' §a§l/ §r§f' . $max . ' §a§l=====>§r');
+						$player->sendMessage ('§6§l<===== §f칭호 목록 §6§l| §r§f' . $page . ' §6§l/ §r§f' . $max . ' §6§l=====>§r');
 						
 						foreach ($data as $key => $value) {
 							
 							$key ++;
 							
-							if ($key >= ($page * $show - ($show - 1)) && $key <= ($page * $show)) $player->sendMessage ('§a§l[' . $key . '번] §r§f' . $value);
+							if ($key >= ($page * $show - ($show - 1)) && $key <= ($page * $show)) $player->sendMessage ('§6§l[' . $key . '번] §r§f' . $value);
 						}
 						
 						return true;
@@ -688,8 +684,8 @@ class MibPrefix extends PluginBase implements Listener
 						
 						$item = Item::get (421, 0, 1);
 						
-						$item->setCustomName ('§r§a§l< §f칭호 티켓 §a| §f' . $prefix . ' §r§l§a>');
-						$item->setLore (['§r이 아이템을 들고 터치하면', '§r§a' . $prefix . '§r (을)를 획득합니다!']);
+						$item->setCustomName ('§r§6§l< §f칭호 티켓 §6| §f' . $prefix . ' §r§l§6>');
+						$item->setLore (['§r이 아이템을 들고 터치하면', '§r§6' . $prefix . '§r (을)를 획득합니다!']);
 						$item->setNamedTagEntry (new StringTag ('칭호', $prefix));
 						
 						$player->getInventory()->addItem ($item);
@@ -797,7 +793,7 @@ class MibPrefix extends PluginBase implements Listener
 				
 					[
 					
-						'text' => '§l시스템 종료하기' . "\n" . '§r§8현재 열린 창을 닫습니다'
+						'text' => '§l▶ 시스템 종료하기' . "\n" . '§r§8현재 열린 창을 닫습니다'
 						
 					],
 					
@@ -808,7 +804,7 @@ class MibPrefix extends PluginBase implements Listener
 							'data' => 'https://gamepedia.cursecdn.com/minecraft_gamepedia/b/b2/Paper.png'
 						],
 						
-						'text' => '§l칭호 변경하기' . "\n" . '§r§8나의 기본 칭호를 변경합니다'
+						'text' => '§l▶ 칭호 변경하기' . "\n" . '§r§8나의 기본 칭호를 변경합니다'
 						
 					],
 					
@@ -819,7 +815,7 @@ class MibPrefix extends PluginBase implements Listener
 							'data' => 'https://gamepedia.cursecdn.com/minecraft_gamepedia/b/b2/Paper.png'
 						],
 						
-						'text' => '§l칭호 구매하기' . "\n" . '§r§8칭호 상점을 오픈합니다'
+						'text' => '§l▶ 칭호 구매하기' . "\n" . '§r§8칭호 상점을 오픈합니다'
 						
 					],
 					
@@ -832,7 +828,7 @@ class MibPrefix extends PluginBase implements Listener
 							
 						],
 						
-						'text' => '§l칭호 만들기' . "\n" . '§r§8자유칭호권이 필요합니다'
+						'text' => '§l▶ 칭호 만들기' . "\n" . '§r§8자유칭호권이 필요합니다'
 					]
 				]
 				
@@ -872,7 +868,7 @@ class MibPrefix extends PluginBase implements Listener
 					foreach ($this->getPrefixs ($player) as $prefix) {
 						
 						$num ++;
-						array_push ($button, ['text' => '§a§l[§r§8' . $num . '§a§l] §r§8' . $prefix]);
+						array_push ($button, ['text' => '§6§l[§r§8' . $num . '§6§l] §r§8' . $prefix]);
 
 					}
 					
@@ -880,7 +876,7 @@ class MibPrefix extends PluginBase implements Listener
 					
 						'type' => 'form',
 						'title' => $this->title,
-						'content' => '현재 §a' . $num . ' §f개의 칭호를 소유하고 있습니다!',
+						'content' => '현재 §6' . $num . ' §f개의 칭호를 소유하고 있습니다!',
 						'buttons' => $button
 
 					]);
@@ -901,7 +897,7 @@ class MibPrefix extends PluginBase implements Listener
 					
 						'type' => 'form',
 						'title' => $this->title,
-						'content' => '현재 상점에는 §a' . $num . ' §f개의 칭호가 등록되어 있습니다!',
+						'content' => '현재 상점에는 §6' . $num . ' §f개의 칭호가 등록되어 있습니다!',
 						'buttons' => $button
 						
 					]);
@@ -917,7 +913,7 @@ class MibPrefix extends PluginBase implements Listener
 						'buttons' => [
 						
 							[
-								'text' => '§l시스템 종료하기' . "\n" . '§r§8현재 열린 창을 닫습니다'
+								'text' => '§l▶ 시스템 종료하기' . "\n" . '§r§8현재 열린 창을 닫습니다'
 							],
 							
 							[
@@ -925,7 +921,7 @@ class MibPrefix extends PluginBase implements Listener
 									'type' => 'url',
 									'data' => 'https://gamepedia.cursecdn.com/minecraft_gamepedia/b/b2/Paper.png'
 								],
-								'text' => '§l일반 자유칭호권' . "\n" . '§r§8최대 6글자 / 색코드 1개'
+								'text' => '§l▶ 일반 자유칭호권' . "\n" . '§r§8최대 6글자 / 색코드 1개'
 							],
 							
 							[
@@ -933,7 +929,7 @@ class MibPrefix extends PluginBase implements Listener
 									'type' => 'url',
 									'data' => 'https://gamepedia.cursecdn.com/minecraft_gamepedia/b/b2/Paper.png'
 								],
-								'text' => '§l중급 자유칭호권' . "\n" . '§r§8최대 12글자 / 색코드 2개'
+								'text' => '§l▶ 중급 자유칭호권' . "\n" . '§r§8최대 12글자 / 색코드 2개'
 							],
 							
 							[
@@ -941,7 +937,7 @@ class MibPrefix extends PluginBase implements Listener
 									'type' => 'url',
 									'data' => 'https://gamepedia.cursecdn.com/minecraft_gamepedia/b/b2/Paper.png'
 								],
-								'text' => '§l고급 자유칭호권' . "\n" . '§r§8최대 12글자 / 색코드 6개'
+								'text' => '§l▶ 고급 자유칭호권' . "\n" . '§r§8최대 12글자 / 색코드 6개'
 							]
 							
 						]
@@ -968,7 +964,7 @@ class MibPrefix extends PluginBase implements Listener
 
 				if ($this->economy->myMoney ($player) < $price) {
 					
-					$this->msgUI ($player, '칭호를 구매하기 위한 돈이 부족합니다! (가격 - ' . $가격 . ')');
+					$this->msgUI ($player, '칭호를 구매하기 위한 돈이 부족합니다! (가격 - ' . $price . ')');
 					return true;
 					
 				}
@@ -1049,7 +1045,7 @@ class MibPrefix extends PluginBase implements Listener
 						
 						[
 							'type' => 'input',
-							'text' => '§l칭호 입력 | 원하는 칭호를 입력해주세요',
+							'text' => '§l▶ 칭호 입력 | 원하는 칭호를 입력해주세요',
 							'placeholder' => '예) 네오스'
 						]
 						
