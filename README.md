@@ -1,8 +1,9 @@
-# MibPrefix
+# NeosPrefix
 
 - A plugin of PocketMine-MP that supports prefix (rank) system on your server
 - You *must* apply the EconomyAPI made by Onebone
 - I wrote how to use this plugin in English, but please forgive me for my bad English ;d
+
 - 칭호 기능을 지원하는 PocketMine-MP의 플러그인입니다
 - 원본님의 EconomyAPI 적용을 필수로 합니다
 
@@ -11,14 +12,15 @@
 
 - /칭호 - Open Prefix System UI
 
-- 칭호 설정 <유저> <칭호> | Set <유저>'s prefix to <칭호>
-- 칭호 추가 <유저> <칭호> | Add <칭호> in <유저>'s prefix slot
-- 칭호 제거 <유저> <칭호> | Remove <칭호> from <유저>'s prefix slot
-- 칭호 목록 <유저> | Check the list of <유저>'s prefix list
-- 칭호 한닉 <유저> <닉네임> | Change <유저>'s nickname to <닉네임>
-- 칭호 티켓 <칭호> | Make prefix (<칭호>) ticket
-- 칭호 상점추가 <가격> <칭호> | Add <칭호> in prefix shop (the price is <가격>)
-- 칭호 상점제거 <칭호> | Remove <칭호> from prefix shop
+- 칭호 설정 <player> <prefix> | Set <player>'s prefix to <prefix>
+- 칭호 추가 <player> <prefix> | Add <prefix> in <player>'s prefix slot
+- 칭호 제거 <player> <prefix> | Remove <prefix> from <player>'s prefix slot
+- 칭호 목록 <player> | Check the list of <player>'s prefix list
+- 칭호 한닉 <player> <nickname> | Change <player>'s nickname to <nickname>
+- 칭호 티켓 <prefix> | Make prefix (<prefix>) ticket
+- 칭호 상점추가 <price> <prefix> | Add <prefix> in prefix shop (the price is <price>)
+- 칭호 상점제거 <prefix> | Remove <prefix> from prefix shop
+- 칭호 자유칭호권 <name> <maximum number of texts> <maximum number of color code (§)> | Make a new free-prefix-ticket
 
 
 # 명령어
@@ -33,6 +35,7 @@
 - 칭호 티켓 <칭호> | 칭호 티켓을 생성합니다
 - 칭호 상점추가 <가격> <칭호> | 칭호 상점을 추가합니다
 - 칭호 상점제거 <칭호> | 칭호상점을 제거합니다
+- 칭호 자유칭호권 <이름> <최대 글자 수> <최대 색코드 수> | 자유칭호권을 이제 명령어로 직접 제작할 수 있습니다
 
 
 # How to make Sign Prefix Shop
@@ -59,17 +62,17 @@
 - 부수면 칭호상점에 제거되고 웅크린채로 상점을 터치하면 칭호를 구매하실 수 있습니다
 
 
-# Changelog [Before Version : Master - Beta 1]
+# Changelog [Master 1.0.1]
 
-- Now, I made it more tidy ;d
-- NEW functions: ['/칭호 제거', SignPrefixShop]
+- Changed the name to NeosPrefix
+- You can make free-prefix-ticket with command
+- the chatting color is set to the color in your config
+- I changed the config type (excluding config.yml)
 
 
-# 체인지로그 [지난 버전 : Master - Beta 1 ]
+# 체인지로그 [Master 1.0.1]
 
-- 우선 지금까지 많은 서버에서 이 플러그인을 사용해주셔서 감사합니다 ;d 앞으로 업데이트를 통해 더 많은 기능을 구현하겠습니다
-- 여러분이 그렇게 원하시던 (?) /칭호 제거 기능이 추가되었습니다
-- 다시 보니까 소스가 엮겨워서 거의 처음부터 다시 만들었습니다
-- 한 db 파일에 묵었었는데, 콘피그를 분할했습니다 (?
-- 표지판 상점 기능이 추가되었습니다 ><
-- 앞으로도 많은 관심 부탁드립니다
+- 이름을 MibPrefix에서 NeosPrefix로 변경하였습니다
+- 이제 원하는 자유칭호권을 명령어로 만들 수 있습니다
+- 채팅 색이 콘피그에 있는 옵션으로 적용됩니다
+- config.yml을 제외한 모든 콘피그 파일이 JSON 형식으로 
