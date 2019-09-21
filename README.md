@@ -8,6 +8,16 @@
 - 원본님의 EconomyAPI 적용을 필수로 합니다
 
 
+# Caution
+
+- It doesn't work in PocketMine-MP 4.0.0-dev please use it in 3.X.X
+
+
+# 주의사항
+
+- 이 플러그인은 PocketMine-MP 4.0.0-dev를 지원하지 않습니다. 3.x.x 빌드를 사용해주세요
+
+
 # Command
 
 - /칭호 - Open Prefix System UI
