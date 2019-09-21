@@ -99,11 +99,34 @@ class NeosPrefix extends PluginBase implements Listener
 		$this->playerbase = new Config($this->getDataFolder() . 'player.yml', Config::JSON);
 		$this->player = $this->playerbase->getAll();
 		
-		$this->shopbase = new Config($this->getDataFolder() . 'shop.yml', Config::JSON);
+		$this->shopbase = new Config($this->getDataFolder() . 'shop.json', Config::JSON);
 		$this->shop = $this->shopbase->getAll();
 		
-		$this->signbase = new Config($this->getDataFolder() . 'sign.yml', Config::JSON);
+		$this->signbase = new Config($this->getDataFolder() . 'sign.json', Config::JSON);
 		$this->sign = $this->signbase->getAll();
+		
+		$this->msgbase = new Config($this->getDataFolder() . 'message.yml', Config::YAML, [
+		
+			'플러그인 칭호' => ' §a§l[NeosPrefix] §r§f',
+			'시스템 종료하기' => "§l시스템 종료하기\n§r§8팝업을 종료합니다",
+			'칭호 상점' => [
+			
+				'§a§l[웅크리고 터치로 구매]',
+				'§a칭호: §r§f(칭호)',
+				'§a가격: §r§f(가격)원',
+				'§fPowered by NeosPE'
+			],
+			'상점 생성 완료' => '칭호 상점 생성을 완료하였습니다',
+			'상점 제거 완료' => '칭호 상점을 제거하였습니다',
+			'이미 칭호 소유' => '이미 해당 칭호를 가지고 있습니다',
+			'돈 부족' => '칭호의 가격은 (가격)원 이지만, 당신은 (내돈)원을 가지고 있습니다',
+			'칭호 구매 완료' => '칭호 구매를 완료하였습니다: (칭호)',
+			'웅크리세요' => '칭호를 구매하려면 웅크리고 터치하세요',
+'			'명령어 도움말' => "칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!\n §a§l[NeosPrefix] §r§f칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!\n §a§l[NeosPrefix] §r§f칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!\n §a§l[NeosPrefix] §r§f칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!\n §a§l[NeosPrefix] §r§f칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!\n §a§l[NeosPrefix] §r§f칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!\n §a§l[NeosPrefix] §r§f칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!\n §a§l[NeosPrefix] §r§f칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!\n §a§l[NeosPrefix] §r§f칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!",
+	
+		]);
+			
+		$this->m = $this->msgbase->getAll();
 		
 		$this->addCommand (['칭호']);
 		
@@ -111,6 +134,7 @@ class NeosPrefix extends PluginBase implements Listener
 		$pluginManager->registerEvents ($this, $this);
 		
 		$this->economy = $pluginManager->getPlugin ('EconomyAPI');
+
 
 	}
 
@@ -140,6 +164,9 @@ class NeosPrefix extends PluginBase implements Listener
     public function save()
     {
 
+        $this->database->setAll($this->db);
+		$this->database->save();
+		
         $this->playerbase->setAll($this->player);
 		$this->playerbase->save();
 		
@@ -154,14 +181,14 @@ class NeosPrefix extends PluginBase implements Listener
 	public function msg($player, $msg)
 	{
 		
-		$player->sendMessage ('§6 ▶ §f'.$msg);
+		$player->sendMessage ($this->m ['플러그인 칭호'] . $msg);
 		
 	}
 	
 	public function allmsg($msg)
 	{
 		
-		$this->getServer()->broadcastMessage ('§6 ▶ §f'.$msg);
+		$this->getServer()->broadcastMessage ($this->m ['플러그인 칭호'] . $msg);
 
 	}
 
@@ -191,7 +218,7 @@ class NeosPrefix extends PluginBase implements Listener
 			'content' => "\n" . $msg . "\n\n\n",
 			'buttons' => [
 				[
-					'text' => '§l▶ 시스템 종료하기' . "\n" . '§r§8현재 열린 창을 닫습니다'
+					'text' => $this->m ['시스템 종료하기']
 				]
 			]
 		]);
@@ -228,20 +255,13 @@ class NeosPrefix extends PluginBase implements Listener
 			
 			];
 			
-			foreach ([
+			foreach ([0,1,2,3] as $index) {
 
-				'§6『 §f칭호 상점 §6』',
-				'§6칭호: §f' . $prefix,
-				'§6가격: §f' . number_format ($price) . '원',
-				'§6§l- - - - - - -'
-
-			] as $index => $text) {
-
-				$event->setLine ($index, $text);
+				$event->setLine ($index, str_replace (['(칭호)', '(가격)'], [$prefix, number_format ($price)], $this->m ['칭호 상점'][$index]));
 
 			}
 			
-			$this->msg ($player, '표지판 상점을 생성했습니다!');
+			$this->msg ($player, $this->m ['상점 생성 완료']);
 			return true;
 			
 		}
@@ -258,10 +278,10 @@ class NeosPrefix extends PluginBase implements Listener
 
 		if ($block->getId() == Block::SIGN_POST || $block->getId() == Block::WALL_SIGN) {
 
-			if (isset ($this->sign [getStringByPos ($block)])) {
+			if ($player->isOp() && isset ($this->sign [getStringByPos ($block)])) {
 				
 				unset ($this->sign [getStringByPos ($block)]);
-				$this->msg ($player, '칭호 상점을 제거했습니다');
+				$this->msg ($player, $this->m ['상점 제거 완료']);
 				
 				return true;
 				
@@ -290,7 +310,7 @@ class NeosPrefix extends PluginBase implements Listener
 				
 				if ($this->hasPrefix ($player, $prefix)) {
 					
-					$this->msg ($player, '이미 해당 칭호를 가지고 있습니다!');
+					$this->msg ($player, $this->m ['이미 칭호 소유']);
 					return true;
 					
 				}
@@ -299,7 +319,7 @@ class NeosPrefix extends PluginBase implements Listener
 				
 				if ($money < $price) {
 					
-					$this->msg ($player, '칭호의 가격은 ' . $price . '원 입니다 (' . $money . '원 소유)');
+					$this->msg ($player, str_replace (['(가격)', '(내돈)'], [$price, $money], $this->m ['돈 부족']));
 					return true;
 					
 				}
@@ -309,13 +329,13 @@ class NeosPrefix extends PluginBase implements Listener
 					$this->economy->reduceMoney ($player, $price);
 					$this->addPrefix ($player, $prefix);
 					
-					$this->msg ($player, '칭호 (' . $prefix . '§r§f) 를 구매하였습니다!');
+					$this->msg ($player, str_replace (['(칭호)'], [$prefix], $this->m ['칭호 구매 완료']));
 					
 					return true;
 					
 				} else {
 					
-					$this->msg ($player, '칭호를 구매하려면 웅크리고 상점을 터치해주세요 (실수 구매 방지)');
+					$this->msg ($player, $this->m ['웅크리세요']);
 					return true;
 					
 				}
@@ -479,16 +499,7 @@ class NeosPrefix extends PluginBase implements Listener
 						
 						if (! isset ($args[2])) {
 							
-							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
-							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
-							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
-							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
-							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
-							
+							$this->msg ($player, $this->m ['명령어 도움말']);
 							return true;
 							
 						}
@@ -518,16 +529,7 @@ class NeosPrefix extends PluginBase implements Listener
 						
 						if (! isset ($args[3])) {
 							
-							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
-							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
-							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
-							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
-							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
-							
+							$this->msg ($player, $this->m ['명령어 도움말']);
 							return true;
 	
 						}
@@ -568,16 +570,7 @@ class NeosPrefix extends PluginBase implements Listener
 						
 						if (! isset ($args[2])) {
 							
-							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
-							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
-							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
-							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
-							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
-							
+							$this->msg ($player, $this->m ['명령어 도움말']);
 							return true;
 							
 						}
@@ -605,17 +598,8 @@ class NeosPrefix extends PluginBase implements Listener
 					} else if ($args[0] === '제거') {
 						
 						if (! isset ($args[2])) {
-							
-							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
-							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
-							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
-							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
-							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
-							
+	
+							$this->msg ($player, $this->m ['명령어 도움말']);
 							return true;
 							
 						}
@@ -650,16 +634,7 @@ class NeosPrefix extends PluginBase implements Listener
 						
 						if (! isset ($args[1])) {
 							
-							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
-							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
-							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
-							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
-							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
-							
+							$this->msg ($player, $this->m ['명령어 도움말']);
 							return true;
 	
 						}
@@ -691,16 +666,7 @@ class NeosPrefix extends PluginBase implements Listener
 						
 						if (! isset ($args[2])) {
 							
-							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
-							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
-							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
-							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
-							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
-							
+							$this->msg ($player, $this->m ['명령어 도움말']);
 							return true;
 							
 						}
@@ -721,16 +687,7 @@ class NeosPrefix extends PluginBase implements Listener
 						
 						if (! isset ($args[1])) {
 							
-							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
-							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
-							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
-							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
-							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
-							
+							$this->msg ($player, $this->m ['명령어 도움말']);
 							return true;
 							
 						}
@@ -754,16 +711,7 @@ class NeosPrefix extends PluginBase implements Listener
 						
 						if (! isset ($args[2])) {
 							
-							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
-							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
-							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
-							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
-							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
-							
+							$this->msg ($player, $this->m ['명령어 도움말']);
 							return true;
 							
 						}
@@ -793,16 +741,7 @@ class NeosPrefix extends PluginBase implements Listener
 						
 						if (! isset ($args[1])) {
 							
-							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
-							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
-							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
-							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
-							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
-							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
-							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
-							
+							$this->msg ($player, $this->m ['명령어 도움말']);
 							return true;
 
 						}
@@ -825,16 +764,7 @@ class NeosPrefix extends PluginBase implements Listener
 
 					} else {
 						
-						$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
-						$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
-						$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
-						$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
-						$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
-						$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
-						$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
-						$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
-						$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
-						
+						$this->msg ($player, $this->m ['명령어 도움말']);
 						return true;
 						
 					}
@@ -964,7 +894,8 @@ class NeosPrefix extends PluginBase implements Listener
 					
 				} else if ($val === 3) {
 					
-					$buttons = [
+					$buttons = [];
+					$buttons [] = [
 					
 						'text' => '§l▶ 시스템 종료하기' . "\n" . '§r§8현재 열린 창을 닫습니다'
 						
@@ -1035,7 +966,7 @@ class NeosPrefix extends PluginBase implements Listener
 			} else if ($id === $this->id [3]) {
 				
 				if ($val === null || $val === 0) return true;
-				$what = array_keys ($this->db ['자유 칭호권'])[$val];
+				$what = array_keys ($this->db ['자유 칭호권'])[$val - 1];
 						
 				$limit1 = $this->db ['자유 칭호권'][$what]['최대 글자'];
 				$limit2 = $this->db ['자유 칭호권'][$what]['최대 색코드 개수'];
@@ -1043,7 +974,7 @@ class NeosPrefix extends PluginBase implements Listener
 				if (
 					
 					! isset ($this->db ['자유 칭호권'][$what]['아이템']) ||
-					! is_array ($this->db ['자유 칭호권'][$what]['아이템']))
+					! is_array ($this->db ['자유 칭호권'][$what]['아이템'])
 							
 				) {
 							
@@ -1104,7 +1035,7 @@ class NeosPrefix extends PluginBase implements Listener
 					
 				}
 				
-				$data = $this->neos [$name]);
+				$data = $this->neos [$name];
 				
 				$limit1 = $data [0];
 				$limit2 = $data [1];
