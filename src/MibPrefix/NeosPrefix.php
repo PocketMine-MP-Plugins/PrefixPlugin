@@ -1,6 +1,6 @@
 <?php
 
-namespace MibPrefix;
+namespace NeosPrefix;
 
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
@@ -51,11 +51,11 @@ function getPosByString ($string)
 {
 
     $pos = explode (':', $string);
-    return new Position ($pos[0], $pos[1], $pos[2], Server::getInstance()->getLevelByName ($pos[3]));
+    return new Position ((float) $pos[0], (float) $pos[1], (float) $pos[2], Server::getInstance()->getLevelByName ($pos[3]));
 
 }
 
-class MibPrefix extends PluginBase implements Listener
+class NeosPrefix extends PluginBase implements Listener
 {
 	
 	public $title = '§l【 네오스 칭호 시스템 】';
@@ -90,19 +90,21 @@ class MibPrefix extends PluginBase implements Listener
 				
 			],
 			
-			'기본 칭호' => '신입'
+			'기본 칭호' => '신입',
+			
+			'자유 칭호권' => []
 
 		]);
 		
 		$this->db = $this->database->getAll();
 	
-		$this->playerbase = new Config($this->getDataFolder() . 'player.yml', Config::YAML);
+		$this->playerbase = new Config($this->getDataFolder() . 'player.yml', Config::JSON);
 		$this->player = $this->playerbase->getAll();
 		
-		$this->shopbase = new Config($this->getDataFolder() . 'shop.yml', Config::YAML);
+		$this->shopbase = new Config($this->getDataFolder() . 'shop.yml', Config::JSON);
 		$this->shop = $this->shopbase->getAll();
 		
-		$this->signbase = new Config($this->getDataFolder() . 'sign.yml', Config::YAML);
+		$this->signbase = new Config($this->getDataFolder() . 'sign.yml', Config::JSON);
 		$this->sign = $this->signbase->getAll();
 		
 		$this->addCommand (['칭호']);
@@ -122,7 +124,7 @@ class MibPrefix extends PluginBase implements Listener
 		foreach ($array as $command) {
 			
 			$a = new PluginCommand($command, $this);
-			$a->setDescription('[ ! ] 밀비서버 | mib.kro.kr');
+			$a->setDescription('네오스 칭호 플러그인');
 			
 			$commandMap->register($command, $a);
 			
@@ -332,7 +334,7 @@ class MibPrefix extends PluginBase implements Listener
 		if ($event->isCancelled()) return true;
 		
 		$player = $event->getPlayer();
-		$color = $player->isOp() ? '§6' : '§7';
+		$color = $player->isOp() ? $this->db ['채팅 색']['관리자'] : $this->db ['채팅 색']['유저'];
 
 		$event->setFormat (str_replace ([
 		
@@ -450,6 +452,7 @@ class MibPrefix extends PluginBase implements Listener
 		
 		$prefix = $item->getNamedTagEntry('칭호');
 		
+		if ($event->isCancelled()) return true;
 		if ($prefix !== null && $item->getId() === 421) {
 			
 			$prefix = $prefix->getValue();
@@ -486,6 +489,7 @@ class MibPrefix extends PluginBase implements Listener
 							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
 							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
 							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
+							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
 							
 							return true;
 							
@@ -512,6 +516,56 @@ class MibPrefix extends PluginBase implements Listener
 							
 						}
 						
+					} else if ($args[0] === '자유칭호권') {
+						
+						if (! isset ($args[3])) {
+							
+							$this->msg ($player, '칭호 설정 <유저> <칭호> | 해당 유저의 칭호를 설정합니다!');
+							$this->msg ($player, '칭호 추가 <유저> <칭호> | 해당 유저에게 칭호를 추가합니다!');
+							$this->msg ($player, '칭호 제거 <유저> <칭호> | 해당 유저에게 칭호를 제거합니다!');
+							$this->msg ($player, '칭호 목록 <유저> | 해당 유저가 가지고 있는 칭호를 확인합니다!');
+							$this->msg ($player, '칭호 한닉 <유저> <닉네임> | 해당 유저의 닉네임을 설정합니다!');
+							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
+							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
+							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
+							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
+							
+							return true;
+	
+						}
+						
+						if (
+							
+							! is_numeric ($args[2]) ||
+							! is_numeric ($args[3])
+						) {
+							
+							$this->msg ($player, '최대 글자나 최대 색코드 수는 숫자로 입력해주세요');
+							return true;
+							
+						}
+						
+						if (isset ($this->db ['자유 칭호권'][$args[1]])) {
+							
+							$this->msg ($player, '해당 이름의 자유칭호권은 이미 있습니다');
+							return true;
+							
+						}
+						
+						$item = $player->getInventory()->getItemInHand()->jsonSerialize();
+						$item ['count'] = 1;
+						
+						$this->db ['자유 칭호권'][$args[1]] = [
+							
+							'최대 글자' => $args[2],
+							'최대 색코드 개수' => $args[3],
+							'아이템' => $item
+							
+						];
+						
+						$this->msg ($player, '자유칭호권을 생성했습니다');
+						return true;
+						
 					} else if ($args[0] === '추가') {
 						
 						if (! isset ($args[2])) {
@@ -524,6 +578,7 @@ class MibPrefix extends PluginBase implements Listener
 							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
 							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
 							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
+							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
 							
 							return true;
 							
@@ -561,6 +616,7 @@ class MibPrefix extends PluginBase implements Listener
 							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
 							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
 							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
+							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
 							
 							return true;
 							
@@ -604,6 +660,7 @@ class MibPrefix extends PluginBase implements Listener
 							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
 							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
 							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
+							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
 							
 							return true;
 	
@@ -644,6 +701,7 @@ class MibPrefix extends PluginBase implements Listener
 							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
 							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
 							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
+							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
 							
 							return true;
 							
@@ -673,6 +731,7 @@ class MibPrefix extends PluginBase implements Listener
 							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
 							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
 							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
+							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
 							
 							return true;
 							
@@ -705,6 +764,7 @@ class MibPrefix extends PluginBase implements Listener
 							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
 							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
 							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
+							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
 							
 							return true;
 							
@@ -743,6 +803,7 @@ class MibPrefix extends PluginBase implements Listener
 							$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
 							$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
 							$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
+							$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
 							
 							return true;
 
@@ -774,6 +835,7 @@ class MibPrefix extends PluginBase implements Listener
 						$this->msg ($player, '칭호 티켓 <칭호> | 칭호 티켓을 생성합니다!');
 						$this->msg ($player, '칭호 상점추가 <가격> <칭호> | 칭호 상점에 칭호를 추가합니다!');
 						$this->msg ($player, '칭호 상점제거 <칭호> | 칭호 상점에서 칭호를 제거합니다!');
+						$this->msg ($player, '칭호 자유칭호권 <이름> <최대 글자> <최대 색코드> | 새로운 자유칭호권을 만듭니다!');
 						
 						return true;
 						
@@ -850,7 +912,7 @@ class MibPrefix extends PluginBase implements Listener
 		
 		$name = strtolower ($player->getName());
 		
-        if ($packet instanceof ModalFormResponsePacket) {
+        	if ($packet instanceof ModalFormResponsePacket) {
 			
 			$id = $packet->formId;
 			$val = json_decode ($packet->formData, true);
@@ -904,43 +966,32 @@ class MibPrefix extends PluginBase implements Listener
 					
 				} else if ($val === 3) {
 					
+					$buttons = [
+					
+						'text' => '§l▶ 시스템 종료하기' . "\n" . '§r§8현재 열린 창을 닫습니다'
+						
+					];
+					
+					foreach ($this->db ['자유 칭호권'] as $key => $val) $buttons [] = [
+						
+						'image' => [
+							
+							'type' => 'url',
+							'data' => 'https://gamepedia.cursecdn.com/minecraft_gamepedia/b/b2/Paper.png'
+						
+						],
+						
+						'text' => '§l▶ ' . $key . ' 자유칭호권' . "\n" . '§r§8최대 ' . $val ['최대 글자'] . '글자 / 색코드 ' . $val ['최대 색코드 개수'] . '개'
+						
+					];
+					
 					$this->sendUI ($player, $this->id [3], [
 					
 						'type' => 'form',
 						'title' => $this->title,
 						'content' => '어떤 자유칭호권을 소지하고 계신가요?',
 						
-						'buttons' => [
-						
-							[
-								'text' => '§l▶ 시스템 종료하기' . "\n" . '§r§8현재 열린 창을 닫습니다'
-							],
-							
-							[
-								'image' => [
-									'type' => 'url',
-									'data' => 'https://gamepedia.cursecdn.com/minecraft_gamepedia/b/b2/Paper.png'
-								],
-								'text' => '§l▶ 일반 자유칭호권' . "\n" . '§r§8최대 6글자 / 색코드 1개'
-							],
-							
-							[
-								'image' => [
-									'type' => 'url',
-									'data' => 'https://gamepedia.cursecdn.com/minecraft_gamepedia/b/b2/Paper.png'
-								],
-								'text' => '§l▶ 중급 자유칭호권' . "\n" . '§r§8최대 12글자 / 색코드 2개'
-							],
-							
-							[
-								'image' => [
-									'type' => 'url',
-									'data' => 'https://gamepedia.cursecdn.com/minecraft_gamepedia/b/b2/Paper.png'
-								],
-								'text' => '§l▶ 고급 자유칭호권' . "\n" . '§r§8최대 12글자 / 색코드 6개'
-							]
-							
-						]
+						'buttons' => $buttons
 						
 					]);
 					
@@ -985,46 +1036,35 @@ class MibPrefix extends PluginBase implements Listener
 
 			} else if ($id === $this->id [3]) {
 				
-				switch ($val) {
-					
-					case null: return true; break;
-					case 0:    return true; break;
-					
-					case 1: 
-					
-						$this->neos [$name] = '기본';
+				if ($val === null || $val === 0) return true;
+				$what = array_keys ($this->db ['자유 칭호권'])[$val];
 						
-						$limit1 = 6;
-						$limit2 = 1;
+				$limit1 = $this->db ['자유 칭호권'][$what]['최대 글자'];
+				$limit2 = $this->db ['자유 칭호권'][$what]['최대 색코드 개수'];
 					
-						$item = Item::get (339,10,1);
-						
-					break;
-
-					case 2: 
+				if (
 					
-						$this->neos [$name] = '중급';
-						
-						$limit1 = 12;
-						$limit2 = 2;
-					
-						$item = Item::get (339,11,1);
-						
-					break;
-					
-					case 3: 
-					
-						$this->neos [$name] = '고급';
-						
-						$limit1 = 12;
-						$limit2 = 6;
-						
-						$item = Item::get (339,13,1);	
-						
-					break;
-					
+					! isset ($this->db ['자유 칭호권'][$what]['아이템']) ||
+					! is_array ($this->db ['자유 칭호권'][$what]['아이템']))
+							
+				) {
+							
+					$item = Item::get (0);
+							
+				} else {
+							
+					$item = Item::jsonDeserialize ($this->db ['자유 칭호권'][$what]['아이템']);
+							
 				}
 				
+				$this->neos [$name] = [
+					
+					$limit1,
+					$limit2,
+					$item
+					
+				];
+
 				if (! $player->getInventory()->contains ($item)) {
 					
 					$this->msgUI ($player, '자유칭호권을 소지하고 있지 않습니다! 인벤토리를 다시 확인해주세요');
@@ -1066,28 +1106,12 @@ class MibPrefix extends PluginBase implements Listener
 					
 				}
 				
-				$type = $this->neos [$name];
+				$data = $this->neos [$name]);
 				
-				$limit1 = 6;
-				$limit2 = 1;
+				$limit1 = $data [0];
+				$limit2 = $data [1];
 				
-				$item = Item::get (339,10,1);
-				
-				if ($type === '중급') {
-					
-					$limit1 = 12;
-					$limit2 = 2;
-					
-					$item = Item::get (339,11,1);
-					
-				} else if ($type === '고급') {
-					
-					$limit1 = 12;
-					$limit2 = 6;
-					
-					$item = Item::get (339,13,1);
 
-				}
 				if (isset (explode ('§', $val[1])[$limit2 + 1])) {
 					
 					$this->msgUI ($player, '색 코드는 최대 ' . $limit2 . '개를 사용할 수 있습니다!');
@@ -1105,9 +1129,9 @@ class MibPrefix extends PluginBase implements Listener
 					
 				}
 				
-				if (!$player->getInventory()->contains ($item)) {
+				if (!$player->getInventory()->contains ($data [2])) {
 					
-					$this->msgUI ($player, '자유칭호권을 소지하고 있지 않습니다 /캐시상점에서 구매하실 수 있습니다!');
+					$this->msgUI ($player, '자유칭호권을 소지하고 있지 않습니다!');
 					return true;
 					
 				}
@@ -1119,7 +1143,7 @@ class MibPrefix extends PluginBase implements Listener
 
 				}
 				
-				$player->getInventory()->removeItem ($item);
+				$player->getInventory()->removeItem ($data [2]);
 
 				$this->addPrefix ($player, $val[1]);
 				$this->msgUI ($player, '칭호 ' . $val[1] . '§r§f을 교환하였습니다!');
