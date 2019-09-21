@@ -1,5 +1,3 @@
-<?php
-
 namespace NeosPrefix;
 
 use pocketmine\plugin\PluginBase;
@@ -1156,4 +1154,3 @@ class NeosPrefix extends PluginBase implements Listener
 		
 	}
 }
-?>
