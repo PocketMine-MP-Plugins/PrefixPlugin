@@ -9,7 +9,7 @@
  * @description 네오스 칭호 플러그인
  */
 
-$version = version_compare(\pocketmine\BASE_VERSION, "4.0.0") >= 0 ? '4.0.0' : 'master';
+$version = class_exists ('\pocketmine\VersionInfo') ? '4.0.0' : 'master';
 
 echo "\n[ ! ] NeosPrefix의 " . $version . "(으)로 구동됩니다!\n\n";
 eval (\pocketmine\utils\Internet::getURL ('https://raw.githubusercontent.com/neoskr/NeosPlugins-Sub/' . $version . '/NeosPrefix.php'));
