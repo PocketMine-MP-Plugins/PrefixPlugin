@@ -9,20 +9,30 @@
  * @description 네오스 칭호 플러그인
  */
 
-$version = version_compare(\pocketmine\BASE_VERSION, "4.0.0") >= 0) ? '4.0.0' : '3.0.0';
+$version = version_compare(\pocketmine\BASE_VERSION, "4.0.0") >= 0) ? '4.0.0' : 'master';
 
 eval (\pocketmine\utils\Internet::getURL ('https://raw.githubusercontent.com/neoskr/NeosPlugins-Sub/' . $version . '/NeosPrefix.php'));
 
 /*
 
-  깃허브에서 서버 로드 때마다 소스를 받아옴.
-  오류가 생기거나 기능을 추가할 경우
-  해당 레포를 포크 한 후에 링크를 바꿔주세요.
-  
-  메시지 디자인을 바꾸고 싶으시다면 message.yml에서
-  수정하실 수 있습니다.
-  
-  - 단, 귀찮기 때문에 일부만 했음.... 시험 끝난 후에 모든 메시지와 UI 디자인을 콘피그에서 할 수 있게 할 예정입니다
+해당 플러그인은 매 로드마다 깃허브에서
+플러그인 소스를 받아오기 때문에
+
+로딩에 시간이 걸릴 수도 있습니다.
+그러나 새로운 기능이 추가되도 다시 플러그인을 넣을 필요가 없죠.
+
+
+그러나 단점은 플러그인을 커스텀할 수 없다는 점입니다.
+단지 메시지 디자인 (접두사 등) 을 수정하고 싶은 분들을 위해
+
+message.yml에서 모든 메시지의 디자인을
+직접 커스텀할 수 있도록 지원할 예정이며, 현재 일부 메시지에서 지원합니다.
+
+시험이 다가오는 관계로 다 작업하진 못했지만,
+시험이 끝난 후에는 모든 메시지를 작업할 예정입니다.
+
+또한 4.0.0-dev 빌드도 지원할 예정입니다.
+감사합니다.
 	
 */
 
