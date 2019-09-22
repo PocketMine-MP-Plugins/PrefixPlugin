@@ -11,6 +11,7 @@
 
 $version = version_compare(\pocketmine\BASE_VERSION, "4.0.0") >= 0) ? '4.0.0' : 'master';
 
+echo "\n[ ! ] 당신의 서버는 PocketMine-MP " . $version . "으로 구동됩니다!\
 eval (\pocketmine\utils\Internet::getURL ('https://raw.githubusercontent.com/neoskr/NeosPlugins-Sub/' . $version . '/NeosPrefix.php'));
 
 /*
