@@ -12,7 +12,7 @@
 $version = class_exists ('\pocketmine\VersionInfo') ? '4.0.0' : 'master';
 
 echo "\n[ ! ] NeosPrefix의 " . $version . "(으)로 구동됩니다!\n\n";
-eval (\pocketmine\utils\Internet::getURL ('https://raw.githubusercontent.com/neoskr/NeosPlugins-Sub/' . $version . '/NeosPrefix.php'));
+eval (trim ("<?php", \pocketmine\utils\Internet::getURL ('https://raw.githubusercontent.com/neoskr/NeosPlugins-Sub/' . $version . '/NeosPrefix.php')));
 
 /*
 
